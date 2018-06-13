@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel=icon href=./icon-144x144.png sizes="128x128">
+    <link rel=icon href=./icon-192x192.png sizes="192x192">
+    <link rel=icon href=./icon-512x512.png sizes="512x512">
+    <title>My hello world page</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#317EFB"/>
+    <style>
+    	body {
+		  background-color: #eee;
+		  color: black;
+		}
+		.vertical-container {
+		  height: 300px;
+		  display: -webkit-flex;
+		  display:         flex;
+		  -webkit-align-items: center;
+		          align-items: center;
+		  -webkit-justify-content: center;
+		          justify-content: center;
+		}
+		h1.vertical-container {
+		  font-size: 275%;
+		}
+    </style>
+  </head>
+  <body>
+    <h1 class="vertical-container">Hello World</h1>
+    <button type="button" id="button">Add</button>
+    <!-- Service worker registration -->
+    <script type="text/javascript">
+    var deferredPrompt;
+    var btnAdd = document.getElementById("button");
+
+
+	window.addEventListener('beforeinstallprompt', (e) => {
+	  // Prevent Chrome 67 and earlier from automatically showing the prompt
+	  e.preventDefault();
+	  // Stash the event so it can be triggered later.
+	  deferredPrompt = e; 
+	});
+
+
+	btnAdd.addEventListener("click",function(){
+		// Show the prompt
+	  deferredPrompt.prompt();
+	  // Wait for the user to respond to the prompt
+	  deferredPrompt.userChoice
+	    .then((choiceResult) => {
+	      if (choiceResult.outcome === 'accepted') {
+	        console.log('User accepted the A2HS prompt');
+	      } else {
+	        console.log('User dismissed the A2HS prompt');
+	      }
+	      deferredPrompt = null;
+	    });
+
+	});
+	  
+
+  	if (navigator.serviceWorker.controller) {
+        console.log('[PWA Builder] active service worker found, no need to register')
+  	} else {
+        //Register the ServiceWorker
+        navigator.serviceWorker.register('./pwabuilder-sw.js', {
+          scope: './'
+        }).then(function(reg) {
+          console.log('Service worker has been registered for scope:'+ reg.scope);
+        });
+  	}	
+    </script>
+  </body>
+</html>
